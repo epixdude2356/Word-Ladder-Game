@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Ladder Game</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <head>
+        <!-- Other meta tags and links -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    </head>
+    
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Welcome to the Word Ladder Game</h1>
+        <h2><u>Instructions</u></h2>
+        <ul>
+            <li>Guess the next word by changing one letter from the current word.</li>
+            <li>Use the hints to help you complete the word</li>
+            <li>Repeat until you reach the final word in the ladder</li>
+            <li>Try to complete the ladder as quickly as possible</li>
+            <li>Your score is calculated based on your time and number of incorrect guesses (misses)</li>
+            <li>Try to score as low as possible</li>
+        </ul>
+        <button id="start-button">Start Game</button>
+        <button id="instructions-bg-color-toggle" title="Toggle dark/light mode">
+            <span class="material-symbols-outlined">
+                routine
+                </span>
+        </button>
+    </div>
+    <div id="game-container">
+        <h1>Daily Word Ladder</h1>
+        <h2 id="current-date"></h2>
+        <h2 hidden id="level">MM/DD</h2>
+        <h2 id="timer">00:00.00</h2>
+        <div id="misses">Misses: 0</div>
+        <p hidden id="score"></p>
+        <div id="word-grid">
+            <!-- The word grid and input fields will be dynamically populated by JavaScript -->
+        </div>
+        <p id="hint"></p>
+        <button id="submit-guess" title="Submit your guess">
+            <span class="material-symbols-outlined">
+                done_outline
+                </span>
+        </button>
+        <p id="message"></p>
+        <div id="buttons-container">
+            <button id="bg-color-toggle" title="Toggle dark/light mode">
+                <span class="material-symbols-outlined">
+                    routine
+                    </span>
+            </button>
+            <button id="stats-button" title="View game statistics"style="display: none;">
+                <span class="material-symbols-outlined">
+                    query_stats
+                    </span>
+            </button>
+        </div>
+        
+        <p id="message2"></p>
+        <p id="message3"></p>
+        <p id="message4"></p>
+        <div id="final-score"></div>
+
+    </div>
+    <script src="script.js"></script>
+
+    <div id="endScreen" class="end-screen">
+        <div class="end-screen-content">
+            <h2>Congratulations!</h2>
+            <h3 id="endFinalTime">Final time: </h3>
+            <h3 id="endMisses"></h3><br>
+            <h2 id="endFinalScore">Final score: </h2>
+            <p>Share your results</p>
+            <button id="share-button">
+                <span class="material-symbols-outlined" title="Share">
+                    share
+                    </span>
+            </button>       
+            <div id="clipboard-notification" style="display: none;">Copied to clipboard!</div>
+     
+            <button id="closeEndScreen" title="Close stats screen">
+                <span class="material-symbols-outlined">
+                    close
+                    </span>
+            </button>
+        </div>
+    </div>
+    
+
+</body>
+</html>
