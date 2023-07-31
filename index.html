@@ -7,12 +7,15 @@
         <!-- Other meta tags and links -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+        <link rel="icon" href="favicon-32x32.png" type="image/x-icon">
+
     </head>
     
 </head>
 <body>
     <div id="start-screen">
         <h1>Welcome to the Word Ladder Game</h1>
+        <h2 id="current-date"></h2>
         <h2><u>Instructions</u></h2>
         <ul>
             <li>Guess the next word by changing one letter from the current word.</li>
@@ -31,7 +34,7 @@
     </div>
     <div id="game-container">
         <h1>Daily Word Ladder</h1>
-        <h2 id="current-date"></h2>
+        <h2 id="main-game-date"></h2>
         <h2 hidden id="level">MM/DD</h2>
         <h2 id="timer">00:00.00</h2>
         <div id="misses">Misses: 0</div>
@@ -70,9 +73,10 @@
     <div id="endScreen" class="end-screen">
         <div class="end-screen-content">
             <h2>Congratulations!</h2>
+            <h2 id="end-screen-date"></h2>
             <h3 id="endFinalTime">Final time: </h3>
             <h3 id="endMisses"></h3><br>
-            <h2 id="endFinalScore">Final score: </h2>
+            <h2 id="endFinalScore">Final score (lower is better): </h2>
             <p>Share your results</p>
             <button id="share-button">
                 <span class="material-symbols-outlined" title="Share">
