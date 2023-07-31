@@ -2,6 +2,7 @@
 A simple daily word game consisting of linking similar words together.
 
 Instructions
+
 Guess the next word by changing one letter from the current word.
 
 Use the hints to help you complete the word.
