@@ -286,7 +286,7 @@ function setupEventListeners() {
     let shareTwitter = document.getElementById('shareTwitter');
 
     document.querySelector('#share-button').addEventListener('click', function() {
-        var messageToShare = `I just scored ${finalScore} on today's word ladder, see if you can beat my score! https://www.examplewordladder.com`;
+        var messageToShare = `I just scored ${finalScore} on today's word ladder, see if you can beat my score! https://www.dailywordladder.com`;
 
         if (window.matchMedia('(max-width: 600px)').matches) {
             if (navigator.share) {
