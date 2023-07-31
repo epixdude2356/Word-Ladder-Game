@@ -4,8 +4,7 @@ let timer = null; // Variable for the timer
 let startTime = null; // Variable for the start time
 let misses = 0; // Variable for the number of incorrect guesses
 let finalScore = 0; // Variable for the final score after multipliers
-let currentDate = new Date();
-document.getElementById('current-date').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
 
 let statsButton = document.getElementById('stats-button');
 
@@ -14,7 +13,7 @@ let levels = [
     { word: 'CAGE', hint: 'Helps you to walk' },
     { word: 'CANE', hint: 'Helps to direct traffic' },
     { word: 'CONE', hint: 'Refers to pitch or emotion of voice' },
-    { word: 'TONE', hint: 'Unit of measurement' },
+    { word: 'TONE', hint: 'Units of weight measurement' },
     { word: 'TONS', hint: 'Level Complete' },
 ];
 
@@ -104,6 +103,7 @@ guessCells.forEach(function(cell, index) {
 
 
 
+
 // Function to update the timer display
 function updateTimer() {
     let now = Date.now();
@@ -142,6 +142,9 @@ function isOneLetterDifferent(word1, word2) {
 }
 
 
+
+
+
 document.getElementById('submit-guess').addEventListener('click', function() {
     if (!timer) {
         return;
@@ -155,22 +158,30 @@ document.getElementById('submit-guess').addEventListener('click', function() {
         if (score === 5) {
             clearInterval(timer);
             document.getElementById('submit-guess').disabled = true;
-        
+
             let timeInSeconds = (Date.now() - startTime) / 1000; // Convert milliseconds to seconds
             finalScore = timeInSeconds * (10 + misses); // Calculate final score
             finalScore = Math.round(finalScore); // Round to the nearest whole number
 
-        
             // Show the end screen
             showEndScreen(timeInSeconds + 's', (10 + misses), finalScore);
         
             // Disable the input fields
             guessCells.forEach(cell => cell.disabled = true);
+
+            // Store the user's statistics in localStorage
+            localStorage.setItem('finalTime', timeInSeconds + 's');
+            localStorage.setItem('misses', misses);
+            localStorage.setItem('finalScore', finalScore);
+
+
+            // Disable replayability
+            localStorage.setItem('lastCompletedDate', new Date().toDateString());
+
         
             return;
         }        
         
-
         document.getElementById('message').textContent = 'Correct!';
         currentLevel++;
         if (currentLevel < levels.length) {
@@ -188,8 +199,10 @@ document.getElementById('submit-guess').addEventListener('click', function() {
         document.getElementById('message').textContent = 'Incorrect, try again.';
         misses++;
         document.getElementById('misses').textContent = 'Misses: ' + misses;
+        guessCells.forEach(cell => cell.value = '');
+        // Add the following line to reset the focus to the leftmost box of the guess row.
+        guessCells[0].focus();
     }
-    guessCells.forEach(cell => cell.value = '');
 });
 
 
@@ -260,9 +273,62 @@ statsButton.addEventListener('click', function() {
 });
 
 
+
+function setupEventListeners() {
+    endScreen = document.getElementById('endScreen');
+    closeEndScreen = document.getElementById('closeEndScreen');
+
+    closeEndScreen.onclick = function() {
+        endScreen.style.display = "none";
+    }
+
+    // Get a reference to the share button
+    let shareTwitter = document.getElementById('shareTwitter');
+
+    document.querySelector('#share-button').addEventListener('click', function() {
+        var messageToShare = `I just scored ${finalScore} on today's word ladder, see if you can beat my score! https://www.examplewordladder.com`;
+
+        if (window.matchMedia('(max-width: 600px)').matches) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Word Ladder Game',
+                    text: messageToShare,
+                    url: window.location.href,
+                })
+                .then(() => console.log('Successful share'))
+                .catch((error) => console.log('Error sharing', error));
+            } else {
+                console.log('Web Share not supported on this browser');
+            }
+        } else {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(messageToShare)
+                .then(() => {
+                    console.log('Text copied to clipboard');
+                    document.getElementById('clipboard-notification').style.display = 'block';
+                    setTimeout(function() {
+                        document.getElementById('clipboard-notification').style.display = 'none';
+                    }, 3000);
+                })
+                .catch((error) => console.log('Error copying text', error));
+            } else {
+                console.log('Clipboard API not supported on this browser');
+            }
+        }
+    });
+}
+
 window.onload = function() {
-    // Theme setting code
-    let theme = localStorage.getItem('theme');  // Get theme from localStorage
+    let currentDate = new Date();
+    let formattedDate = currentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
+    document.getElementById('current-date').textContent = formattedDate;
+    document.getElementById('main-game-date').textContent = formattedDate;
+    document.getElementById('end-screen-date').textContent = formattedDate;
+    
+    setupEventListeners();
+
+    let theme = localStorage.getItem('theme');
     let body = document.body;
     if (theme === 'dark') {
         body.style.backgroundColor = 'black';
@@ -271,6 +337,61 @@ window.onload = function() {
         body.style.backgroundColor = 'white';
         body.style.color = 'black';
     }
+
+    let today = new Date();
+    let lastCompletedDate = localStorage.getItem('lastCompletedDate');
+    if (lastCompletedDate && lastCompletedDate === today.toDateString()) {
+        let finalTime = localStorage.getItem('finalTime');
+        let misses = localStorage.getItem('misses');
+        let finalScore = localStorage.getItem('finalScore');
+
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        
+        showEndScreen(finalTime, misses, finalScore);
+
+        currentLevel = levels.length - 1;
+        updateWordAndHint();
+    }
+}
+
+    // Theme setting code
+    let theme = localStorage.getItem('theme');  // Get theme from localStorage
+    let body = document.body;
+    
+    if (theme === 'dark') {
+        body.style.backgroundColor = 'black';
+        body.style.color = 'white';
+    } else {
+        body.style.backgroundColor = 'white';
+        body.style.color = 'black';
+    }
+
+    // Check if the game was already completed today
+    let today = new Date();
+    let lastCompletedDate = localStorage.getItem('lastCompletedDate');
+    if (lastCompletedDate && lastCompletedDate === today.toDateString()) {
+        // Show the completed game screen
+        document.getElementById('endScreen').style.display = 'block';
+    } 
+
+    if (lastCompletedDate && lastCompletedDate === today.toDateString()) {
+        // Retrieve the user's statistics from localStorage
+        let finalTime = localStorage.getItem('finalTime');
+        let misses = localStorage.getItem('misses');
+        let finalScore = localStorage.getItem('finalScore');
+
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+
+        // Show the end screen
+        showEndScreen(finalTime, misses, finalScore);
+
+        // Show the completed word ladder
+        currentLevel = levels.length - 1;
+        updateWordAndHint();
+        
+    } 
 
     // Other onload code
     endScreen = document.getElementById('endScreen');
@@ -313,9 +434,6 @@ window.onload = function() {
                     setTimeout(function() {
                         document.getElementById('clipboard-notification').style.display = 'none';
                     }, 3000);
-
-
-                    
                 })
                 .catch((error) => console.log('Error copying text', error));
             } else {
@@ -323,5 +441,4 @@ window.onload = function() {
             }
         }
     });
-}
 
