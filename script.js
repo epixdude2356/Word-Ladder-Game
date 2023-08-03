@@ -4,18 +4,47 @@ let timer = null; // Variable for the timer
 let startTime = null; // Variable for the start time
 let misses = 0; // Variable for the number of incorrect guesses
 let finalScore = 0; // Variable for the final score after multipliers
-
-
 let statsButton = document.getElementById('stats-button');
 
-let levels = [
-    { word: 'RAGE', hint: 'Trapped in a ___' },
-    { word: 'CAGE', hint: 'Helps you to walk' },
-    { word: 'CANE', hint: 'Helps to direct traffic' },
-    { word: 'CONE', hint: 'Refers to pitch or emotion of voice' },
-    { word: 'TONE', hint: 'Units of weight measurement' },
-    { word: 'TONS', hint: 'Level Complete' },
-];
+// Levels will be fetched from the server when the game starts
+let levels = [];
+
+// Start button event listener
+document.getElementById('start-button').addEventListener('click', function() {
+    // Fetch levels from server
+    fetch('https://word-ladder-server.uc.r.appspot.com/api/ladder')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data received from server:', data);  // Log the raw data
+            levels = data; // Assign the entire data array to levels
+            console.log('Levels after processing:', levels);  // Log the processed data
+
+            // Set up the first level
+            currentLevel = 0;
+            updateWordAndHint();
+
+            // Start the timer
+            startTime = Date.now();
+            timer = setInterval(updateTimer, 10); // Update the timer every 10 milliseconds
+
+            // Focus the first input field
+            let firstGuessCell = document.querySelector(`.guess-cell.row-1`);
+            if (firstGuessCell) {
+                firstGuessCell.focus();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+
+    // Hide the start screen and show the game
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+});
+
 
 
 
@@ -143,14 +172,13 @@ function isOneLetterDifferent(word1, word2) {
 
 
 
-
-
 document.getElementById('submit-guess').addEventListener('click', function() {
     if (!timer) {
         return;
     }
     
     let guess = guessCells.map(cell => cell.value.toUpperCase()).join('');
+
     if (isOneLetterDifferent(guess, levels[currentLevel].word) && guess === levels[currentLevel+1].word.toUpperCase()) {
         score++;
         document.getElementById('score').textContent = 'Score: ' + score;
@@ -159,9 +187,9 @@ document.getElementById('submit-guess').addEventListener('click', function() {
             clearInterval(timer);
             document.getElementById('submit-guess').disabled = true;
 
-            let timeInSeconds = (Date.now() - startTime) / 1000; // Convert milliseconds to seconds
-            finalScore = timeInSeconds * (10 + misses); // Calculate final score
-            finalScore = Math.round(finalScore); // Round to the nearest whole number
+            let timeInSeconds = (Date.now() - startTime) / 1000;
+            finalScore = timeInSeconds * (10 + misses);
+            finalScore = Math.round(finalScore);
 
             // Show the end screen
             showEndScreen(timeInSeconds + 's', (10 + misses), finalScore);
@@ -174,11 +202,9 @@ document.getElementById('submit-guess').addEventListener('click', function() {
             localStorage.setItem('misses', misses);
             localStorage.setItem('finalScore', finalScore);
 
-
             // Disable replayability
             localStorage.setItem('lastCompletedDate', new Date().toDateString());
 
-        
             return;
         }        
         
@@ -200,36 +226,12 @@ document.getElementById('submit-guess').addEventListener('click', function() {
         misses++;
         document.getElementById('misses').textContent = 'Misses: ' + misses;
         guessCells.forEach(cell => cell.value = '');
-        // Add the following line to reset the focus to the leftmost box of the guess row.
         guessCells[0].focus();
     }
 });
 
 
 
-// Start button event listener
-document.getElementById('start-button').addEventListener('click', function() {
-    // Hide the start screen and show the game
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('game-container').style.display = 'block';
-
-
-    // Set up the first level
-    currentLevel = 0;
-    updateWordAndHint();
-
-
-    // Start the timer
-    startTime = Date.now();
-    timer = setInterval(updateTimer, 10); // Update the timer every 10 milliseconds
-
-
-    // Focus the first input field
-    let firstGuessCell = document.querySelector(`.guess-cell.row-1`);
-    if (firstGuessCell) {
-        firstGuessCell.focus();
-    }
-});
 
 
 
@@ -252,11 +254,13 @@ document.getElementById('bg-color-toggle').addEventListener('click', function() 
 
 // Initialization code
 document.getElementById('game-container').style.display = 'none'; // Hide the game initially
-updateWordAndHint();
+if (levels.length > 0) {
+    updateWordAndHint();
+}
 
 
 
-let endScreen;
+
 let closeEndScreen;
 
 function showEndScreen(finalTime, multiplier, finalScore) {
@@ -322,9 +326,11 @@ window.onload = function() {
     let currentDate = new Date();
     let formattedDate = currentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 
-    document.getElementById('current-date').textContent = formattedDate;
-    document.getElementById('main-game-date').textContent = formattedDate;
-    document.getElementById('end-screen-date').textContent = formattedDate;
+    // Set the date on the elements
+    document.getElementById('current-date').innerText = formattedDate;
+    document.getElementById('main-game-date').innerText = formattedDate;
+    document.getElementById('end-screen-date').innerText = formattedDate;
+    console.log("window.onload is called");
     
     setupEventListeners();
 
@@ -441,4 +447,3 @@ window.onload = function() {
             }
         }
     });
-
