@@ -129,6 +129,19 @@ guessCells.forEach(function(cell, index) {
 });
 }
 
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Backspace') {
+        let activeElement = document.activeElement;
+        if (activeElement && activeElement.className.includes('guess-cell') && !activeElement.value) {
+            let previousCell = activeElement.previousElementSibling;
+            if (previousCell && previousCell.className.includes('guess-cell')) {
+                previousCell.focus();
+                previousCell.value = '';  // Clear the previous cell value
+            }
+        }
+    }
+});
+
 
 
 
